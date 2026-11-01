@@ -1,19 +1,22 @@
 schema_version: 1
 
 context:
-  version: "0.35.0"
+  # dev track: upstream main at a pinned SHA. `.dev<commit date>` sorts below the
+  # next release (0.36.0.dev20260929 < 0.36.0), so the 0.36.0 package supersedes it.
+  version: "0.36.0.dev20260929"
+  upstream_sha: "f4cc0807bbe5d975f25cb2aadae313404d4a8b11"
 
 package:
   name: tesseract-robotics
   version: ${{ version }}
 
 source:
-  - url: https://github.com/tesseract-robotics/tesseract/archive/refs/tags/${{ version }}.tar.gz
-    sha256: 98935411bcf2261fc3e8854c7528dd0cdf1a466f7ae131d630699e494eb9d4c9
+  - url: https://github.com/tesseract-robotics/tesseract/archive/${{ upstream_sha }}.tar.gz
+    sha256: a6170e2f8ebd7e141daf680f7fc5a83f0edede48351b7eea9afc5ae2bd0e2636
     file_name: source.tar.gz
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -38,7 +41,7 @@ requirements:
     - cereal
     - eigen-abi-devel
     - tinyxml2
-    - console_bridge
+    - spdlog
     - assimp
     - urdfdom
     - fcl
@@ -62,7 +65,7 @@ requirements:
     - cereal
     - eigen
     - tinyxml2
-    - console_bridge
+    - spdlog
     - assimp
     - urdfdom
     - fcl
