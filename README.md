@@ -33,49 +33,93 @@ Current release info
 Installing tesseract-robotics
 =============================
 
-Installing `tesseract-robotics` from the `tesseract-robotics` channel can be achieved by adding `tesseract-robotics` to your channels with:
+Installing `tesseract-robotics` from the `tesseract-robotics/label/dev` channel can be achieved by adding `tesseract-robotics/label/dev` to your channels with:
 
 ```
-conda config --add channels tesseract-robotics
+conda config --add channels tesseract-robotics/label/dev
 conda config --set channel_priority strict
 ```
 
-Once the `tesseract-robotics` channel has been enabled, `tesseract-robotics` can be installed with `conda`:
+How to use
+----------
+
+<details>
+<summary>With conda</summary>
 
 ```
 conda install tesseract-robotics
 ```
 
-or with `mamba`:
+</details>
+
+<details>
+<summary>With mamba</summary>
 
 ```
 mamba install tesseract-robotics
 ```
 
-It is possible to list all of the versions of `tesseract-robotics` available on your platform with `conda`:
+</details>
+
+<details>
+<summary>With pixi</summary>
 
 ```
-conda search tesseract-robotics --channel tesseract-robotics
+# for adding to your local project
+pixi add tesseract-robotics
+# for installing globally
+pixi global install tesseract-robotics
 ```
 
-or with `mamba`:
+</details>
+
+Search package versions
+-----------------------
+
+It is possible to list all of the versions of `tesseract-robotics` available on your platform:
+
+<details>
+<summary>With conda</summary>
 
 ```
-mamba search tesseract-robotics --channel tesseract-robotics
+conda search tesseract-robotics --channel tesseract-robotics/label/dev
 ```
 
-Alternatively, `mamba repoquery` may provide more information:
+</details>
+
+<details>
+<summary>With mamba</summary>
+
+```
+mamba search tesseract-robotics --channel tesseract-robotics/label/dev
+```
+
+</details>
+
+<details>
+<summary>With pixi</summary>
+
+```
+pixi search tesseract-robotics --channel tesseract-robotics/label/dev
+```
+
+</details>
+
+<details>
+<summary>With mamba repoquery, which may provide more information</summary>
 
 ```
 # Search all versions available on your platform:
-mamba repoquery search tesseract-robotics --channel tesseract-robotics
+mamba repoquery search tesseract-robotics --channel tesseract-robotics/label/dev
 
 # List packages depending on `tesseract-robotics`:
-mamba repoquery whoneeds tesseract-robotics --channel tesseract-robotics
+mamba repoquery whoneeds tesseract-robotics --channel tesseract-robotics/label/dev
 
 # List dependencies of `tesseract-robotics`:
-mamba repoquery depends tesseract-robotics --channel tesseract-robotics
+mamba repoquery depends tesseract-robotics --channel tesseract-robotics/label/dev
 ```
+
+</details>
 
 
 

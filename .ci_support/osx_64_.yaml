@@ -1,5 +1,3 @@
-MACOSX_DEPLOYMENT_TARGET:
-- '11.0'
 MACOSX_SDK_VERSION:
 - '11.0'
 assimp:
@@ -9,29 +7,33 @@ bullet_cpp:
 c_compiler:
 - clang
 c_compiler_version:
-- '19'
+- '21'
+c_stdlib:
+- macosx_deployment_target
+c_stdlib_version:
+- '11.0'
 channel_sources:
-- tesseract-robotics,conda-forge
+- tesseract-robotics/label/dev,tesseract-robotics,conda-forge
 channel_targets:
-- tesseract-robotics main
-console_bridge:
-- '1.0'
+- tesseract-robotics dev
 cxx_compiler:
 - clangxx
 cxx_compiler_version:
-- '19'
+- '21'
 eigen_abi_devel:
 - 5.0.1
 flann:
 - 1.9.2
 jsoncpp:
-- 1.9.6
+- 1.9.8
 libboost_devel:
 - '1.88'
 macos_machine:
 - x86_64-apple-darwin13.4.0
 pcl:
 - 1.15.1
+spdlog:
+- '1.17'
 target_platform:
 - osx-64
 tinyxml2:
