@@ -5,7 +5,7 @@ provider:
   linux: github_actions
   osx: github_actions
   osx_arm64: github_actions
-  win: github_actions
+  win: None
   linux_aarch64: github_actions
   linux_ppc64le: None
 
