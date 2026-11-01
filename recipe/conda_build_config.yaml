@@ -7,3 +7,7 @@ libboost_devel:
 eigen_abi_devel:
 - '5.0.1'
 
+# pcl->vtk-base builds for jsoncpp 1.9.8 exist only on boost 1.90 (open libboost190
+# migration); stay on jsoncpp 1.9.6 + boost 1.88 until that migration closes.
+jsoncpp:
+- '1.9.6'
