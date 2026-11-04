@@ -16,7 +16,7 @@ source:
     file_name: source.tar.gz
 
 build:
-  number: 1
+  number: 2
 
 requirements:
   build:
