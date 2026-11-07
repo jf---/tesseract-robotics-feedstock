@@ -16,7 +16,7 @@ source:
     file_name: source.tar.gz
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -30,6 +30,9 @@ requirements:
     - ninja
     - pkg-config
     - lcov
+    - if: win
+      then: m2-patch
+      else: patch
     - if: linux
       then:
         - ${{ cdt('mesa-libgl-devel') }}

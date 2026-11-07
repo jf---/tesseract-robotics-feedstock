@@ -1,0 +1,103 @@
+From 185fb85e064b408c48b01f1e368cc6ad88ab5931 Mon Sep 17 00:00:00 2001
+From: Jelle Feringa <jelleferinga@gmail.com>
+Date: Sat, 7 Nov 2026 15:25:23 +0100
+Subject: [PATCH] Reapply link collision-enabled flags to rebuilt contact
+ managers
+
+ChangeLinkCollisionEnabledCommand disables the link in the scene graph and in the cached
+discrete and continuous managers. getDiscreteContactManagerHelper and
+getContinuousContactManagerHelper build a manager from the scene graph's links but never
+read getLinkCollisionEnabled, so any rebuild re-enables the link while
+Environment::getLinkCollisionEnabled still reports false. That happens on
+setActiveDiscreteContactManager, setActiveContinuousContactManager, the named
+getDiscreteContactManager(name) / getContinuousContactManager(name), and
+clearCached*ContactManager followed by a fetch.
+
+Disable every collision object whose link is disabled in the scene graph after adding
+the objects, in both helpers.
+
+Upstream: https://github.com/tesseract-robotics/tesseract/pull/1395
+---
+ environment/src/environment.cpp               | 14 ++++++++
+ .../test/tesseract_environment_unit.cpp       | 33 +++++++++++++++++++
+ 2 files changed, 47 insertions(+)
+
+diff --git a/environment/src/environment.cpp b/environment/src/environment.cpp
+index 7dc8532..02415a4 100644
+--- a/environment/src/environment.cpp
++++ b/environment/src/environment.cpp
+@@ -1020,6 +1020,13 @@ Environment::Implementation::getDiscreteContactManagerHelper(const std::string&
+ 
+     manager->addCollisionObjects(objects);
+ 
++    // A manager built from scratch must honour links disabled by ChangeLinkCollisionEnabledCommand
++    for (const auto& object : objects)
++    {
++      if (!scene_graph->getLinkCollisionEnabled(object.id))
++        manager->disableCollisionObject(object.id);
++    }
++
+     manager->setActiveCollisionObjects(state_solver->getActiveLinkIds());
+   }
+ 
+@@ -1047,6 +1054,13 @@ Environment::Implementation::getContinuousContactManagerHelper(const std::string
+ 
+     manager->addCollisionObjects(objects);
+ 
++    // A manager built from scratch must honour links disabled by ChangeLinkCollisionEnabledCommand
++    for (const auto& object : objects)
++    {
++      if (!scene_graph->getLinkCollisionEnabled(object.id))
++        manager->disableCollisionObject(object.id);
++    }
++
+     manager->setActiveCollisionObjects(state_solver->getActiveLinkIds());
+   }
+ 
+diff --git a/environment/test/tesseract_environment_unit.cpp b/environment/test/tesseract_environment_unit.cpp
+index 85f1476..3ffbaec 100644
+--- a/environment/test/tesseract_environment_unit.cpp
++++ b/environment/test/tesseract_environment_unit.cpp
+@@ -1362,6 +1362,39 @@ TEST(TesseractEnvironmentUnit, EnvChangeLinkCollisionEnabledCommandUnit)  // NOL
+   EXPECT_TRUE(env->getSceneGraph()->getLinkCollisionEnabled(link_name));
+ }
+ 
++TEST(TesseractEnvironmentUnit, EnvChangeLinkCollisionEnabledSurvivesManagerRebuildUnit)  // NOLINT
++{
++  auto env = getEnvironment();
++  const tesseract::common::LinkId link_id("link_1");
++  EXPECT_TRUE(env->applyCommand(std::make_shared<ChangeLinkCollisionEnabledCommand>(link_id, false)));
++  ASSERT_FALSE(env->getLinkCollisionEnabled(link_id));
++
++  // The cached managers were edited in place by the command
++  EXPECT_FALSE(env->getDiscreteContactManager()->isCollisionObjectEnabled(link_id));
++  EXPECT_FALSE(env->getContinuousContactManager()->isCollisionObjectEnabled(link_id));
++
++  // Managers built from scratch must honour the same flag
++  env->clearCachedDiscreteContactManager();
++  env->clearCachedContinuousContactManager();
++  EXPECT_FALSE(env->getDiscreteContactManager()->isCollisionObjectEnabled(link_id));
++  EXPECT_FALSE(env->getContinuousContactManager()->isCollisionObjectEnabled(link_id));
++
++  EXPECT_FALSE(env->getDiscreteContactManager("BulletDiscreteSimpleManager")->isCollisionObjectEnabled(link_id));
++  EXPECT_FALSE(env->getContinuousContactManager("BulletCastSimpleManager")->isCollisionObjectEnabled(link_id));
++
++  EXPECT_TRUE(env->setActiveDiscreteContactManager("BulletDiscreteSimpleManager"));
++  EXPECT_TRUE(env->setActiveContinuousContactManager("BulletCastSimpleManager"));
++  EXPECT_FALSE(env->getDiscreteContactManager()->isCollisionObjectEnabled(link_id));
++  EXPECT_FALSE(env->getContinuousContactManager()->isCollisionObjectEnabled(link_id));
++
++  // Re-enabling still reaches a rebuilt manager
++  EXPECT_TRUE(env->applyCommand(std::make_shared<ChangeLinkCollisionEnabledCommand>(link_id, true)));
++  env->clearCachedDiscreteContactManager();
++  env->clearCachedContinuousContactManager();
++  EXPECT_TRUE(env->getDiscreteContactManager()->isCollisionObjectEnabled(link_id));
++  EXPECT_TRUE(env->getContinuousContactManager()->isCollisionObjectEnabled(link_id));
++}
++
+ TEST(TesseractEnvironmentUnit, EnvChangeLinkVisibilityCommandUnit)  // NOLINT
+ {
+   // Get the environment
+-- 
+2.39.5 (Apple Git-154)
+
